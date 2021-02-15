@@ -1,3 +1,6 @@
+using Azure.Storage.Blobs;
+using AzureIdentityLivestream.Web.Services;
+using AzureIdentityLivestream.Web.Services.AzureBlobStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +21,10 @@ namespace AzureIdentityLivestream.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry();
+
+            services.AddSingleton(_ => new BlobServiceClient(Configuration.GetValue<string>("StorageConnectionString")));
+            services.AddSingleton<IPersonProvider, AzureBlobStoragePersonProvider>();
+
             services.AddRazorPages();
         }
 

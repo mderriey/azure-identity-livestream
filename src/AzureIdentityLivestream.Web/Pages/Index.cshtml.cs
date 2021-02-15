@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using AzureIdentityLivestream.Web.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 namespace AzureIdentityLivestream.Web.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
+        private readonly IPersonProvider _personProvider;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(IPersonProvider personProvider)
         {
-            _logger = logger;
+            _personProvider = personProvider;
         }
 
-        public void OnGet()
+        public async Task OnGet()
         {
-
+            People = await _personProvider.GetPeople();
+            PersonProviderTypeName = _personProvider.GetType().Name;
         }
+
+        public IEnumerable<Person> People { get; set; }
+        public string PersonProviderTypeName { get; set; }
     }
 }
