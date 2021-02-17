@@ -18,6 +18,18 @@ namespace AzureIdentityLivestream.Web.Services.Sql
             _cache = cache;
         }
 
+        public (string Token, DateTimeOffset ExpiresOn) GetAccessToken()
+        {
+            return _cache.GetOrCreate(_cacheKey, entry =>
+            {
+                var (token, expiresOn) = _inner.GetAccessToken();
+
+                entry.SetAbsoluteExpiration(expiresOn);
+
+                return (token, expiresOn);
+            });
+        }
+
         public async Task<(string Token, DateTimeOffset ExpiresOn)> GetAccessTokenAsync(CancellationToken cancellationToken)
         {
             return await _cache.GetOrCreateAsync(_cacheKey, async entry =>

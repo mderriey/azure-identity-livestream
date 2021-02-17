@@ -14,6 +14,14 @@ namespace AzureIdentityLivestream.Web.Services.Sql
 
         private static readonly string[] _azureSqlScopes = new string[] { "https://database.windows.net//.default" };
 
+        public (string Token, DateTimeOffset ExpiresOn) GetAccessToken()
+        {
+            var tokenRequest = new TokenRequestContext(_azureSqlScopes);
+            var tokenResult = _credential.GetToken(tokenRequest, default);
+
+            return (tokenResult.Token, tokenResult.ExpiresOn);
+        }
+
         public async Task<(string Token, DateTimeOffset ExpiresOn)> GetAccessTokenAsync(CancellationToken cancellationToken = default)
         {
             var tokenRequest = new TokenRequestContext(_azureSqlScopes);
