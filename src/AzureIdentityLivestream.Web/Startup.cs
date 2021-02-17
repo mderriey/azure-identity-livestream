@@ -2,6 +2,7 @@ using AzureIdentityLivestream.Web.Services;
 using AzureIdentityLivestream.Web.Services.Sql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,17 +22,13 @@ namespace AzureIdentityLivestream.Web
         {
             services.AddApplicationInsightsTelemetry();
 
-            services.AddMemoryCache();
-            services.AddSingleton<IAzureSqlTokenProvider, AzureIdentityAzureSqlTokenProvider>();
-            services.Decorate<IAzureSqlTokenProvider, CacheAzureSqlTokenProvider>();
-
-            services.AddSingleton(provider =>
+            services.AddDbContext<LivestreamContext>(builder =>
             {
                 var sqlConnectionString = Configuration.GetValue<string>("SqlConnectionString");
-                return new SqlConnectionFactory(sqlConnectionString, provider.GetRequiredService<IAzureSqlTokenProvider>());
+                builder.UseSqlServer(sqlConnectionString, options => options.EnableRetryOnFailure());
             });
 
-            services.AddSingleton<IPersonProvider, DapperPersonProvider>();
+            services.AddScoped<IPersonProvider, EfCorePersonProvider>();
 
             services.AddRazorPages();
         }
