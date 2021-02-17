@@ -1,3 +1,5 @@
+using System;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using AzureIdentityLivestream.Web.Services;
 using AzureIdentityLivestream.Web.Services.AzureBlobStorage;
@@ -22,7 +24,21 @@ namespace AzureIdentityLivestream.Web
         {
             services.AddApplicationInsightsTelemetry();
 
-            services.AddSingleton(_ => new BlobServiceClient(Configuration.GetValue<string>("StorageConnectionString")));
+            services.AddSingleton(_ =>
+            {
+                var storageConnectionString = Configuration.GetValue<string>("StorageConnectionString");
+                if (Uri.TryCreate(storageConnectionString, UriKind.Absolute, out var storageEndpointUri))
+                {
+                    var credential = new ChainedTokenCredential(
+                        new ManagedIdentityCredential(),
+                        new VisualStudioCodeCredential());
+
+                    return new BlobServiceClient(storageEndpointUri, credential);
+                }
+
+                return new BlobServiceClient(storageConnectionString);
+            });
+
             services.AddSingleton<IPersonProvider, AzureBlobStoragePersonProvider>();
 
             services.AddRazorPages();
