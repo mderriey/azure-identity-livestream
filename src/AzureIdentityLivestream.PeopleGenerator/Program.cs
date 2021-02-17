@@ -13,7 +13,7 @@ namespace AzureIdentityLivestream.PeopleGenerator
                 .Build();
 
             var people = await PersonCreator.CreateRandomPeople(30);
-            await BlobPeopleGenerator.CreatePeople(configuration, people);
+            await SqlPeopleGenerator.CreatePeople(configuration, people);
         }
     }
 }
