@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
 using Microsoft.Data.SqlClient;
 
 namespace AzureIdentityLivestream.Web.Services.Sql
@@ -9,10 +7,12 @@ namespace AzureIdentityLivestream.Web.Services.Sql
     public class SqlConnectionFactory
     {
         private readonly string _connectionString;
+        private readonly IAzureSqlTokenProvider _azureSqlTokenProvider;
 
-        public SqlConnectionFactory(string connectionString)
+        public SqlConnectionFactory(string connectionString, IAzureSqlTokenProvider azureSqlTokenProvider)
         {
             _connectionString = connectionString;
+            _azureSqlTokenProvider = azureSqlTokenProvider;
         }
 
         public async Task<SqlConnection> CreateConnection()
@@ -23,14 +23,8 @@ namespace AzureIdentityLivestream.Web.Services.Sql
             if (sqlConnection.DataSource.Contains("database.windows.net", StringComparison.OrdinalIgnoreCase) &&
                 string.IsNullOrEmpty(sqlConnectionStringBuilder.UserID))
             {
-                var credential = new ChainedTokenCredential(
-                    new ManagedIdentityCredential(),
-                    new VisualStudioCodeCredential());
-
-                var tokenRequest = new TokenRequestContext(new[] { "https://database.windows.net//.default" });
-                var tokenResponse = await credential.GetTokenAsync(tokenRequest);
-
-                sqlConnection.AccessToken = tokenResponse.Token;
+                var (token, _) = await _azureSqlTokenProvider.GetAccessTokenAsync();
+                sqlConnection.AccessToken = token;
             }
 
             return sqlConnection;

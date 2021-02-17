@@ -1,8 +1,4 @@
-using System;
-using Azure.Identity;
-using Azure.Storage.Blobs;
 using AzureIdentityLivestream.Web.Services;
-using AzureIdentityLivestream.Web.Services.AzureBlobStorage;
 using AzureIdentityLivestream.Web.Services.Sql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,10 +21,14 @@ namespace AzureIdentityLivestream.Web
         {
             services.AddApplicationInsightsTelemetry();
 
-            services.AddSingleton(_ =>
+            services.AddMemoryCache();
+            services.AddSingleton<IAzureSqlTokenProvider, AzureIdentityAzureSqlTokenProvider>();
+            services.Decorate<IAzureSqlTokenProvider, CacheAzureSqlTokenProvider>();
+
+            services.AddSingleton(provider =>
             {
                 var sqlConnectionString = Configuration.GetValue<string>("SqlConnectionString");
-                return new SqlConnectionFactory(sqlConnectionString);
+                return new SqlConnectionFactory(sqlConnectionString, provider.GetRequiredService<IAzureSqlTokenProvider>());
             });
 
             services.AddSingleton<IPersonProvider, DapperPersonProvider>();
