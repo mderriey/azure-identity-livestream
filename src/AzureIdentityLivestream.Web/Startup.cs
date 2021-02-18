@@ -17,6 +17,7 @@ namespace AzureIdentityLivestream.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
             services.AddRazorPages();
         }
 

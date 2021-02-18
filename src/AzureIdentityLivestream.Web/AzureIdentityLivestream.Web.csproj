@@ -5,4 +5,8 @@
     <UserSecretsId>AzureIdentityLivestream</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.16.0" />
+  </ItemGroup>
+
 </Project>
