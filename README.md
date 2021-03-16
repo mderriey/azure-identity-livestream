@@ -1,6 +1,7 @@
 # Azure Identity Livestream
 
-This is the repository used during the 425show Twitch livestream at <https://www.twitch.tv/videos/919350158>.
+This is the repository used during the 425show Twitch livestream which happened on the 18th of February 2021.
+While the video isn't available on Twitch anymore, you can catch it up on YouTube at <https://www.youtube.com/watch?v=KYgXboJrU5M>.
 
 The goal is to have a look at the Azure Identity library, which is part of the Azure SDK.
 It allows developers to leverage Azure Active Directory authentication when interacting with Azure services that support it.
