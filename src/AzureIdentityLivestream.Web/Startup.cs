@@ -22,17 +22,11 @@ namespace AzureIdentityLivestream.Web
         {
             services.AddApplicationInsightsTelemetry();
 
-            services.AddMemoryCache();
-            services.AddSingleton<IAzureSqlTokenProvider, AzureIdentityAzureSqlTokenProvider>();
-            services.Decorate<IAzureSqlTokenProvider, CacheAzureSqlTokenProvider>();
-            services.AddSingleton<AzureAdAuthenticationDbConnectionInterceptor>();
-
             services.AddDbContext<LivestreamContext>((provider, builder) =>
             {
                 var sqlConnectionString = Configuration.GetValue<string>("SqlConnectionString");
-                builder
-                    .UseSqlServer(sqlConnectionString, options => options.EnableRetryOnFailure())
-                    .AddInterceptors(provider.GetRequiredService<AzureAdAuthenticationDbConnectionInterceptor>());
+
+                builder.UseSqlServer(sqlConnectionString, options => options.EnableRetryOnFailure());
             });
 
             services.AddScoped<IPersonProvider, EfCorePersonProvider>();
